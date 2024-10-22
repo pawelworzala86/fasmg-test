@@ -51,6 +51,7 @@ function Parse(source){
             console.log(params)
             for(const param of params){
                 body = body.replace(new RegExp(param,'gm'),'[rbp+'+(idx*8+16)+']')
+                idx--
             }
         }
         FUNCTIONS.push({

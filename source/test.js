@@ -1,5 +1,5 @@
 function testProc(paramA,paramB){
-    printf("%i ", paramA)
+    printf("%i %i ", paramA, paramB)
 }
 
 function main(){
