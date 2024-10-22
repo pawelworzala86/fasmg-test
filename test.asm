@@ -8,18 +8,17 @@ entry start
 
 ;include 'include\\opengl.inc'
 
-proc testProc
+testProc:
     push rbp
     mov rbp, rsp
     sub rsp, 8*2
 
-    mov rax, [rbp+32]
+    mov rax, [rbp+24]
     invoke printf, "%i ", rax
 
     mov rsp, rbp
     pop rbp
-    ret
-endp
+ret
 
 section '.text' code readable executable
 
