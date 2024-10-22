@@ -109,34 +109,8 @@ ret`
 
 sourceOrg = Parse(sourceOrg)
 
-fs.writeFileSync('./cache/'+fileName+'.asm',`
-; programming example
+let frame = fs.readFileSync('./frame/cmd.asm').toString()
 
-include 'win64a.inc'
+frame = frame.replace(/{{SOURCE}}/gm, sourceOrg)
 
-format PE64 CONSOLE 5.0
-entry start
-
-;include 'include\\opengl.inc'
-
-
-section '.text' code readable executable
-
-${sourceOrg}
-
-start:
-    sub	rsp,8		; Make stack dqword aligned
-
-    call main
-
-    ;invoke printf, "OK"
-
-    invoke	ExitProcess,0
-
-
-section '.data' data readable writeable
-    lf db 13,10,0
-
-
-section '.idata' import data readable writeable
-    include 'include\\idata.inc'`)
+fs.writeFileSync('./cache/'+fileName+'.asm',frame)
