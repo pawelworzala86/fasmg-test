@@ -8,10 +8,31 @@ entry start
 
 ;include 'include\\opengl.inc'
 
+proc testProc
+    push rbp
+    mov rbp, rsp
+    sub rsp, 8*2
+
+    mov rax, [rbp+32]
+    invoke printf, "%i ", rax
+
+    mov rsp, rbp
+    pop rbp
+    ret
+endp
+
 section '.text' code readable executable
 
     start:
     sub	rsp,8		; Make stack dqword aligned
+
+    push [dataA]
+    push 666
+    call testProc
+
+    push 111
+    push 666
+    call testProc
 
     invoke printf, "OK"
 
@@ -19,6 +40,8 @@ section '.text' code readable executable
 
 section '.data' data readable writeable
     lf db 13,10,0
+
+    dataA dq 123
 
 
 section '.idata' import data readable writeable
