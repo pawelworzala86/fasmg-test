@@ -55,13 +55,14 @@ function Parse(source){
         let name = head.split('(')[0].replace('function','').trim()
         //console.log(params)
         //console.log(name)
-        let count = params.length
+        let count = 1 //= params.length
         let idx = 1
         if((params.length>0)&&params[0].name.length>0){
             console.log(params)
             for(const param of params){
                 body = body.replace(new RegExp(param.name,'gm'),'[rbp+'+(idx*8+16)+']')
                 idx--
+                count++
             }
         }
         FUNCTIONS.push({
@@ -69,7 +70,7 @@ function Parse(source){
             params,
             body
         })
-        if((params.length>0)&&params[0].name.length>0){
+        //if((params.length>0)&&params[0].name.length>0){
         return `${name}:
     push rbp
     mov rbp, rsp
@@ -79,18 +80,7 @@ function Parse(source){
 
     mov rsp, rbp
     pop rbp
-ret`}else{
-    return `${name}:
-    push rbp
-    mov rbp, rsp
-    sub rsp, 8
-
-    ${body}
-
-    mov rsp, rbp
-    pop rbp
 ret`
-}
     })
 
     FUNCTIONS.map(FUNC=>{
