@@ -1,8 +1,6 @@
 const fs = require('fs')
 
-var fileName = process.argv[2]
 
-let sourceOrg = fs.readFileSync('./source/'+fileName+'.ts').toString()
 
 function Blocks(source){
     let newSource = ''
@@ -106,6 +104,12 @@ ret`
 
     return source
 }
+
+
+
+var fileName = process.argv[2]
+
+let sourceOrg = fs.readFileSync('./source/'+fileName+'.ts').toString()
 
 sourceOrg = Parse(sourceOrg)
 
