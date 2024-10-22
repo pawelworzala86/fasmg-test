@@ -42,21 +42,17 @@ function Parse(source){
     }
 
     r(/function([\s\S]+?)(?<num>\:[0-9]+)\{([\s\S]+?)(\k<num>)\}/gm,match=>{
-        //console.log(match)
         let head = match.split(/:[0-9]+\{/)[0]
-        //console.log(head)
+
         let index = match.split(':')
         index=index[index.length-1].replace(':','').replace('}','')
-        //console.log(index)
-        //.split('{')[0]
-        //console.log('index',index)
+
         let body = match.split(new RegExp(':'+index+'\\{'))[1].split(new RegExp(':'+index+'\\}'))[0]
-        //console.log(body)
+
         let params = getParams(head)
         let name = head.split('(')[0].replace('function','').trim()
-        //console.log(params)
-        //console.log(name)
-        let count = 1 //= params.length
+
+        let count = 1
         let idx = 1
         if((params.length>0)&&params[0].name.length>0){
             console.log(params)
@@ -71,7 +67,7 @@ function Parse(source){
             params,
             body
         })
-        //if((params.length>0)&&params[0].name.length>0){
+        
         return `${name}:
     push rbp
     mov rbp, rsp
