@@ -56,6 +56,7 @@ function Parse(source){
             params,
             body
         })
+        if((params.length>0)&&params[0].length>0){
         return `${name}:
     push rbp
     mov rbp, rsp
@@ -65,16 +66,27 @@ function Parse(source){
 
     mov rsp, rbp
     pop rbp
+ret`}else{
+    return `${name}:
+    push rbp
+    mov rbp, rsp
+    sub rsp, 8
+
+    ${body}
+
+    mov rsp, rbp
+    pop rbp
 ret`
+}
     })
 
     FUNCTIONS.map(FUNC=>{
-        r(new RegExp(FUNC.name+'\\([\s\S]+?\\)','gm'),match=>{
+        r(new RegExp(FUNC.name+'\\([\\s\\S]+?\\)','gm'),match=>{
             console.log(match)
             let params = match.split('(')[1].split(')')[0].split(',')
             let head = ''
             for(const param of params){
-                head += 'push '+param+'\n'
+                head += '   push '+param+'\n'
             }
             return `${head}
     call ${FUNC.name}`
@@ -89,4 +101,34 @@ ret`
 
 sourceOrg = Parse(sourceOrg)
 
-fs.writeFileSync('./compiled.asm',sourceOrg)
+fs.writeFileSync('./compiled.asm',`
+; programming example
+
+include 'win64a.inc'
+
+format PE64 CONSOLE 5.0
+entry start
+
+;include 'include\\opengl.inc'
+
+
+section '.text' code readable executable
+
+${sourceOrg}
+
+start:
+    sub	rsp,8		; Make stack dqword aligned
+
+    call main
+
+    ;invoke printf, "OK"
+
+    invoke	ExitProcess,0
+
+
+section '.data' data readable writeable
+    lf db 13,10,0
+
+
+section '.idata' import data readable writeable
+    include 'include\\idata.inc'`)
