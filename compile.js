@@ -36,6 +36,12 @@ function Parse(source){
     r(/console.log/gm,'printf')
 
 
+    function getParams(text){
+        return text.split('(')[1].split(')')[0].split(',').map(param=>{
+            let prop = param.split(':')
+            return {name:prop[0],type:prop[1]}
+        })
+    }
 
     r(/function([\s\S]+?)(?<num>\:[0-9]+)\{([\s\S]+?)(\k<num>)\}/gm,match=>{
         //console.log(match)
@@ -48,10 +54,7 @@ function Parse(source){
         //console.log('index',index)
         let body = match.split(new RegExp(':'+index+'\\{'))[1].split(new RegExp(':'+index+'\\}'))[0]
         //console.log(body)
-        let params = head.split('(')[1].split(')')[0].split(',').map(param=>{
-            let prop = param.split(':')
-            return {name:prop[0],type:prop[1]}
-        })
+        let params = getParams(head)
         let name = head.split('(')[0].replace('function','').trim()
         //console.log(params)
         //console.log(name)
@@ -86,10 +89,7 @@ ret`
     FUNCTIONS.map(FUNC=>{
         r(new RegExp(FUNC.name+'\\([\\s\\S]+?\\)','gm'),match=>{
             console.log(match)
-            let params = match.split('(')[1].split(')')[0].split(',').map(param=>{
-                let prop = param.split(':')
-                return {name:prop[0],type:prop[1]}
-            })
+            let params = getParams(match)
             let head = ''
             for(const param of params){
                 head += '   push '+param.name+'\n'
