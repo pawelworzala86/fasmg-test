@@ -90,7 +90,7 @@ ret`
             let params = getParams(match)
             let head = ''
             for(const param of params){
-                head += '   push '+param.name+'\n'
+                head += '\n   push '+param.name
             }
             return `${head}
     call ${FUNC.name}`
