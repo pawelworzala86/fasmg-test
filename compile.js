@@ -2,7 +2,7 @@ const fs = require('fs')
 
 var fileName = process.argv[2]
 
-let sourceOrg = fs.readFileSync('./source/'+fileName+'.js').toString()
+let sourceOrg = fs.readFileSync('./source/'+fileName+'.ts').toString()
 
 function Blocks(source){
     let newSource = ''
@@ -34,23 +34,30 @@ function Parse(source){
 
 
 
-    r(/function(.*)(?<num>\:[0-9]+)\{([\s\S]+?)(\k<num>)\}/gm,match=>{
+    r(/function([\s\S]+?)(?<num>\:[0-9]+)\{([\s\S]+?)(\k<num>)\}/gm,match=>{
         //console.log(match)
         let head = match.split(/:[0-9]+\{/)[0]
         //console.log(head)
-        let index = match.split(':')[1].split('{')[0]
+        let index = match.split(':')
+        index=index[index.length-1].replace(':','').replace('}','')
+        //console.log(index)
+        //.split('{')[0]
+        //console.log('index',index)
         let body = match.split(new RegExp(':'+index+'\\{'))[1].split(new RegExp(':'+index+'\\}'))[0]
         //console.log(body)
-        let params = head.split('(')[1].split(')')[0].split(',')
+        let params = head.split('(')[1].split(')')[0].split(',').map(param=>{
+            let prop = param.split(':')
+            return {name:prop[0],type:prop[1]}
+        })
         let name = head.split('(')[0].replace('function','').trim()
         //console.log(params)
         //console.log(name)
         let count = params.length
         let idx = 1
-        if((params.length>0)&&params[0].length>0){
+        if((params.length>0)&&params[0].name.length>0){
             console.log(params)
             for(const param of params){
-                body = body.replace(new RegExp(param,'gm'),'[rbp+'+(idx*8+16)+']')
+                body = body.replace(new RegExp(param.name,'gm'),'[rbp+'+(idx*8+16)+']')
                 idx--
             }
         }
@@ -59,7 +66,7 @@ function Parse(source){
             params,
             body
         })
-        if((params.length>0)&&params[0].length>0){
+        if((params.length>0)&&params[0].name.length>0){
         return `${name}:
     push rbp
     mov rbp, rsp
@@ -86,10 +93,13 @@ ret`
     FUNCTIONS.map(FUNC=>{
         r(new RegExp(FUNC.name+'\\([\\s\\S]+?\\)','gm'),match=>{
             console.log(match)
-            let params = match.split('(')[1].split(')')[0].split(',')
+            let params = match.split('(')[1].split(')')[0].split(',').map(param=>{
+                let prop = param.split(':')
+                return {name:prop[0],type:prop[1]}
+            })
             let head = ''
             for(const param of params){
-                head += '   push '+param+'\n'
+                head += '   push '+param.name+'\n'
             }
             return `${head}
     call ${FUNC.name}`
