@@ -1,5 +1,5 @@
 function testProc(paramA:number,paramB:number):void{
-    printf("%i %i ", paramA, paramB)
+    console.log("%i %i ", paramA, paramB)
 }
 
 function main():void{

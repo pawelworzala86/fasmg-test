@@ -33,6 +33,9 @@ function Parse(source){
     source = Blocks(source)
 
 
+    r(/console.log/gm,'printf')
+
+
 
     r(/function([\s\S]+?)(?<num>\:[0-9]+)\{([\s\S]+?)(\k<num>)\}/gm,match=>{
         //console.log(match)
@@ -107,6 +110,8 @@ ret`
     })
 
     r(/([a-zA-Z0-9\_]+)\(([\s\S]+?)\)/gm,'invoke $1, $2')
+
+    
 
 
     return source
