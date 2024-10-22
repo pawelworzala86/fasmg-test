@@ -25,6 +25,5 @@ start:
 section '.data' data readable writeable
     lf db 13,10,0
 
-
 section '.idata' import data readable writeable
     include 'include\\idata.inc'

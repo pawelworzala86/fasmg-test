@@ -35,11 +35,56 @@ function Parse(source){
 
 
     function getParams(text){
-        return text.split('(')[1].split(')')[0].split(',').map(param=>{
-            let prop = param.split(':')
-            return {name:prop[0],type:prop[1]}
+        let res=[]
+        text.split('(')[1].split(')')[0].split(',').map(param=>{
+            if(param.trim().length>0){
+                let prop = param.split(':')
+                res.push({name:prop[0].trim(),type:prop[1]})
+            }
         })
+        return res
     }
+    function getClassParams(text){
+        let res=[]
+        text.split('\n').map(param=>{
+            if(param.trim().length>0){
+                let name = param.split(':')[0]
+                let prop = param.split(':')[1].split('=')
+                res.push({name:name.trim(),default:prop[1].trim(),type:prop[0].trim()})
+            }
+        })
+        return res
+    }
+
+
+    
+    r(/class ([\s\S]+?)(?<num>\:[0-9]+)\{([\s\S]+?)(\k<num>)\}/gm,match=>{
+        let head = match.split(/:[0-9]+\{/)[0]
+
+        let index = match.split(':')
+        index=index[index.length-1].replace(':','').replace('}','')
+
+        let body = match.split(new RegExp(':'+index+'\\{'))[1].split(new RegExp(':'+index+'\\}'))[0]
+        let name = head.split('{')[0].replace('class','').trim()
+
+        const funcs = []
+        body=body.replace(/([a-zA-Z0-9\_]+)\(.*?\)(?<num>\:[0-9]+)\{([\s\S]+?)(\k<num>)\}/gm,mmm=>{
+            //console.log(match)
+            funcs.push(mmm)
+            return ''
+        })
+
+        let params = getClassParams(body)
+
+        console.log(name,body,params)
+
+        return `    struct ${name}
+ ${params.map(param=>{
+            return `    ${param.name} dq ${param.default}`
+        })}
+    ends`
+    })
+
 
     r(/function([\s\S]+?)(?<num>\:[0-9]+)\{([\s\S]+?)(\k<num>)\}/gm,match=>{
         let head = match.split(/:[0-9]+\{/)[0]
@@ -55,7 +100,7 @@ function Parse(source){
         let count = 1
         let idx = 1
         if((params.length>0)&&params[0].name.length>0){
-            console.log(params)
+            //console.log(params)
             for(const param of params){
                 body = body.replace(new RegExp(param.name,'gm'),'[rbp+'+(idx*8+16)+']')
                 idx--
@@ -67,7 +112,7 @@ function Parse(source){
             params,
             body
         })
-        
+
         return `${name}:
     push rbp
     mov rbp, rsp
@@ -80,9 +125,14 @@ function Parse(source){
 ret`
     })
 
+
+
+
+
+
     FUNCTIONS.map(FUNC=>{
         r(new RegExp(FUNC.name+'\\([\\s\\S]+?\\)','gm'),match=>{
-            console.log(match)
+            //console.log(match)
             let params = getParams(match)
             let head = ''
             for(const param of params){
