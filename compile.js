@@ -1,6 +1,8 @@
 const fs = require('fs')
 
-let sourceOrg = fs.readFileSync('./test.js').toString()
+var fileName = process.argv[2]
+
+let sourceOrg = fs.readFileSync('./'+fileName+'.js').toString()
 
 function Blocks(source){
     let newSource = ''
@@ -101,7 +103,7 @@ ret`
 
 sourceOrg = Parse(sourceOrg)
 
-fs.writeFileSync('./compiled.asm',`
+fs.writeFileSync('./'+fileName+'.asm',`
 ; programming example
 
 include 'win64a.inc'
